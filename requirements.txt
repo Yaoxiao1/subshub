@@ -1,2 +1,4 @@
-git+https://github.com/abdeladim-s/subsai
-openai
+ffmpeg-python==0.2.0
+openai==1.10.0
+openai-whisper==20231106
+subsai==1.2.5
