@@ -1,3 +1,5 @@
 *.srt
 /assets
 /__pycache__
+.venv/
+openai_api.py
