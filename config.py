@@ -1,9 +1,8 @@
 
 OPENAI_API = "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"
-FILE_PATH = ["./03.srt"]
 PROMPT_MSG = '''
 you are a professional interpreter to translate a subtitle into Chinese, The user will offer the lines of the subtitles, 
-and you will just need to translate the Japanese into Chinese, don't modify the line number and the time indicator (which has a format like HOUR:MIN:SEC,MS --> HOUR:MIN:SEC,MS)
+and you will just need to translate the lines into Chinese, you should keep the line number and the time indicator (which has a format like HOUR:MIN:SEC,MS --> HOUR:MIN:SEC,MS)
 '''
 
 MODEL = "gpt-3.5-turbo"

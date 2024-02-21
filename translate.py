@@ -3,6 +3,8 @@ from tqdm import tqdm
 import threading
 import time
 from config import *
+import logging
+import os
 
 
 TOKENS_USED = 0
@@ -13,16 +15,17 @@ FINAL_RESULT = {}
 client = OpenAI(api_key=OPENAI_API)
     
 
-def convert_file_to_list(file_path):
+def convert_file_to_list(file_path: str) -> list:
     with open(file_path, 'r') as file:
         lines = file.readlines()
     return lines
 
 
-def sync_main():
+def sync_main(file_path: list):
     result = ""
     tokens = 0
-    for file in FILE_PATH:
+    for file in file_path:
+        srt_chn = os.path.splitext(file)[0] + "_CHN.srt"
         all_lines = convert_file_to_list(file)
         line_idx = 0
         for line_idx in tqdm(range(0, len(all_lines), CHUNK_SIZE*BATCH_SIZE)):
@@ -41,15 +44,17 @@ def sync_main():
             result += completion.choices[0].message.content + "\n"
             tokens += completion.usage.total_tokens
     
-    with open("result.srt", "w") as r:
-        r.write(result)
-    print(f'tokens : {tokens}') 
+        with open(srt_chn, "w") as r:
+            r.write(result)
+    logging.debug(f'tokens : {tokens}') 
 
 
-def multi_thread_main():
+def multi_thread_main(file_path : list):
     import math
     global TARGET_LINES
-    for file in FILE_PATH:
+    for file in file_path:
+        TARGET_LINES = 0
+        srt_chn = os.path.splitext(file)[0] + "_CHN.srt"
         handlers = []
         all_lines = convert_file_to_list(file)
         # result = ""
@@ -67,23 +72,23 @@ def multi_thread_main():
             handlers.append(x)
         for handler in handlers:
             handler.join()
-        with open("result.srt", "w") as f:
+        with open(srt_chn, "w") as f:
             result = dict(sorted(FINAL_RESULT.items()))
             content = ""
             for v in result.values():
                 content += v
             f.write(content)
-    print(f"{TOKENS_USED} tokens used!")
+    logging.debug(f"{TOKENS_USED} tokens used!")
 
 
 
-def translate_chunk(idx, all_lines):
+def translate_chunk(idx: int, all_lines: list):
     global TOKENS_USED, CURRENT_LINES, FINAL_RESULT
-    print(f"Thread {idx} starts...")
+    logging.debug(f"Thread {idx} starts...")
     result = ""
-    for line_idx in range(0, len(all_lines), CHUNK_SIZE*BATCH_SIZE):
-
-        message_content = ''.join(all_lines[line_idx:min(line_idx+CHUNK_SIZE*BATCH_SIZE, len(all_lines))])
+    for line_start_idx in range(0, len(all_lines), CHUNK_SIZE*BATCH_SIZE):
+        line_end_idx = min(line_start_idx+CHUNK_SIZE*BATCH_SIZE, len(all_lines))
+        message_content = ''.join(all_lines[line_start_idx:line_end_idx])
         completion = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
@@ -92,20 +97,17 @@ def translate_chunk(idx, all_lines):
             ]
         )
 
-        result += completion.choices[0].message.content + "\n"
-        CURRENT_LINES += CHUNK_SIZE * BATCH_SIZE
+        result += completion.choices[0].message.content + "\n\n"
+        CURRENT_LINES += line_end_idx - line_start_idx + 1
         TOKENS_USED += completion.usage.total_tokens
-        print(f"{CURRENT_LINES} out of {TARGET_LINES} lines translated.")
-        
+        logging.debug(f"{CURRENT_LINES} out of {TARGET_LINES} lines translated.")
     FINAL_RESULT[idx] = result
-    # print(result)
-    # return result
 
 
 if __name__ == "__main__":
     
     start = time.time()
     # sync_main()
-    multi_thread_main()
+    multi_thread_main(["./assets/test0.srt"])
     end = time.time()
     print("duration : {}".format(end-start))

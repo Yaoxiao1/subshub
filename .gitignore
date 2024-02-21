@@ -1,1 +1,3 @@
 *.srt
+/assets
+/__pycache__
