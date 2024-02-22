@@ -5,6 +5,7 @@ import time
 from config import *
 import logging
 import os
+from utils import show_time_period
 
 
 TOKENS_USED = 0
@@ -48,7 +49,7 @@ def sync_main(file_path: list):
             r.write(result)
     logging.debug(f'tokens : {tokens}') 
 
-
+@show_time_period
 def multi_thread_main(file_path : list):
     import math
     global TARGET_LINES

@@ -3,3 +3,5 @@
 /__pycache__
 .venv/
 openai_api.py
+test.py
+.vscode

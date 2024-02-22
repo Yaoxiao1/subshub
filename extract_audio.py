@@ -13,6 +13,14 @@ def is_video_file(file_path):
         return True
     else:
         return False
+    
+def is_audio_file(file_path):
+    audio_extensions = ['.mp3', '.wav', '.flac', '.aac']
+    file_extension = os.path.splitext(file_path)[1].lower()
+    if file_extension in audio_extensions:
+        return True
+    else:
+        return False
 
 # Example usage
 

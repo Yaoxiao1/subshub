@@ -8,6 +8,7 @@ and you will just need to translate the lines into Chinese, you should keep the 
 
 MODEL = "gpt-3.5-turbo"
 MESSAGES = []
-THREAD_COUNT = 3
-CHUNK_SIZE = 4
-BATCH_SIZE = 5
+THREAD_COUNT = 8
+CHUNK_SIZE = 4  # every 4 lines consist a dialog
+BATCH_SIZE = 25
+STOPWORDS = ["あ", "ん", "え"]
