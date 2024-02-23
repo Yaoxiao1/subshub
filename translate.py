@@ -5,6 +5,7 @@ import time
 from config import *
 import logging
 import os
+import sys
 from utils import show_time_period
 
 
@@ -17,7 +18,7 @@ client = OpenAI(api_key=OPENAI_API)
     
 
 def convert_file_to_list(file_path: str) -> list:
-    with open(file_path, 'r') as file:
+    with open(file_path, 'r', encoding='utf-8') as file:
         lines = file.readlines()
     return lines
 
@@ -73,13 +74,13 @@ def multi_thread_main(file_path : list):
             handlers.append(x)
         for handler in handlers:
             handler.join()
-        with open(srt_chn, "w") as f:
+        with open(srt_chn, "w", encoding="utf-8") as f:
             result = dict(sorted(FINAL_RESULT.items()))
             content = ""
             for v in result.values():
                 content += v
             f.write(content)
-    logging.debug(f"{TOKENS_USED} tokens used!")
+    logging.info(f"{TOKENS_USED} tokens used!")
 
 
 
@@ -108,7 +109,8 @@ def translate_chunk(idx: int, all_lines: list):
 if __name__ == "__main__":
     
     start = time.time()
+    file_path = sys.argv[1]
     # sync_main()
-    multi_thread_main(["./assets/test0.srt"])
+    multi_thread_main([file_path])
     end = time.time()
     print("duration : {}".format(end-start))

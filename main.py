@@ -7,6 +7,7 @@ from translate import multi_thread_main
 import sys
 import time
 from washing import sub_washing
+import threading
 
 
 def run(path: str):
@@ -23,21 +24,23 @@ def run(path: str):
     # step2 transcribe audio to original subtitle
     logging.info("step2 transcribe audio to original subtitle start...")
     subs_ai = subsai.SubsAI()
-    model = subs_ai.create_model('openai/whisper', {'model_type': 'medium'})
+    model = subs_ai.create_model('openai/whisper', {'model_type': 'small'})
     subs = subs_ai.transcribe(audio_path, model)
     original_srts_path = os.path.splitext(audio_path)[0] + ".srt"
     subs.save(original_srts_path)
+    os.remove(audio_path)
 
     # step3 washing the original title
     logging.info("step3 washing the original title start...")
     sub_washing(original_srts_path)
     
     # step4 translate original subtitle to Chinese
-    logging.info("step4 translate original subtitle to Chinese start...")
-    multi_thread_main([original_srts_path])
+    # logging.info("step4 translate original subtitle to Chinese start...")
+    # multi_thread_main([original_srts_path])
 
     # step4 combine original and translated subtitles
     # TODO: combine original and translated subtitles
+
 
 
 
@@ -48,4 +51,5 @@ if __name__ == "__main__":
         logging.info("start traslating {}".format(file))
         run(file)
         logging.info("finished traslating {}".format(file))
+        time.sleep(180)
     logging.info("all files translated!")
