@@ -7,6 +7,7 @@ import logging
 import os
 import sys
 from utils import show_time_period
+from combine_srt import combine
 
 
 TOKENS_USED = 0
@@ -80,6 +81,7 @@ def multi_thread_main(file_path : list):
             for v in result.values():
                 content += v
             f.write(content)
+        combine(file, srt_chn)
     logging.info(f"{TOKENS_USED} tokens used!")
 
 

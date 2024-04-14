@@ -24,7 +24,7 @@ def run(path: str):
     # step2 transcribe audio to original subtitle
     logging.info("step2 transcribe audio to original subtitle start...")
     subs_ai = subsai.SubsAI()
-    model = subs_ai.create_model('openai/whisper', {'model_type': 'small'})
+    model = subs_ai.create_model('openai/whisper', {'model_type': 'medium', 'language' : 'japanese', 'device':"cuda:0"})
     subs = subs_ai.transcribe(audio_path, model)
     original_srts_path = os.path.splitext(audio_path)[0] + ".srt"
     subs.save(original_srts_path)
